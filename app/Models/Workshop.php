@@ -27,4 +27,29 @@ class Workshop extends Model
 
         return $events;
     }
+
+    public function getFutureEventsWithWorkshops()
+    {
+        $workshops = DB::table('workshops')->get();
+        $events = DB::table('events')
+            ->join('workshops', 'workshops.event_id', '=', 'events.id')
+            ->where('workshops.start', '>', date('Y-m-d'))
+            ->limit(3)
+            ->get();
+
+        foreach ($events as $key => &$event) {
+            $event->workshops = [];
+            foreach ($workshops as $ws) {
+                if ($ws->event_id == $event->id) {
+                    $event->workshops[] = $ws;
+                }
+            }
+
+            if (empty($event->workshops)) {
+                unset($events[$key]);
+            }
+        }
+
+        return $events;
+    }
 }

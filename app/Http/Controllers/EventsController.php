@@ -182,6 +182,9 @@ class EventsController extends BaseController
 
     public function getFutureEventsWithWorkshops()
     {
-        throw new \Exception('implement in coding task 2');
+        // throw new \Exception('implement in coding task 2');
+
+        $Workshop_Model = new Workshop();
+        return response()->json($Workshop_Model->getFutureEventsWithWorkshops());
     }
 }
