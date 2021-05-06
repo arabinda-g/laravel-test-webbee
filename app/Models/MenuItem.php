@@ -17,39 +17,49 @@ class MenuItem extends Model
 
         $new_menu_items = [];
         $count = 0;
-        $index1 = 0;
-        $index2 = 0;
-        foreach ($menu_items as $key => $item) {
+        $child = 0;
+        $child_flag = false;
+        $changed = false;
+
+        foreach ($menu_items as $item) {
+
+            // Check if this is the first item
             if ($count == 0) {
-                $new_menu_items[$index1] = $item;
-                $new_menu_items[$index1]->children = [];
-                $count++;
-            } else if ($count <= 2) {
-                $new_menu_items[$index1]->children[$index2] = $item;
-                $new_menu_items[$index1]->children[$index2]->children = [];
-
-
-                $index2++;
-                $count++;
-            } else if ($count > 2 && $count <= 4) {
-                // dd($new_menu_items[$index1]->children[$index2]);
-                // var_dump($count, $index1, $index2);
-
-                $new_menu_items[$index1]->children[$index2]->children = $item;
-
-                $index2++;
+                $new_menu_items[0] = $item;
+                $new_menu_items[0]->children = [];
                 $count++;
             } else {
-                $index1++;
-                // $index2++;
-                $count = 0;
-            }
 
-            if ($count == 3) {
-                $index2 = 0;
+                // Add item only if empty
+                if (empty($new_menu_items[0]->children[$count])) {
+                    $new_menu_items[0]->children[$count] = $item;
+                    $new_menu_items[0]->children[$count]->children = [];
+                }
+
+                // Prevent adding the same item in children
+                if ($child_flag) {
+                    $new_menu_items[0]->children[$count]->children[] = $item;
+
+                    // Check if this is the 2nd item
+                    if ($child == 1) {
+                        $count++;
+                        $child = 0;
+                        $child_flag = false;
+                        $changed = true;
+                    } else {
+                        $child++;
+                    }
+                }
+
+                // Check if child_flag has changed
+                if ($changed) {
+                    $changed = false;
+                } else {
+                    $child_flag = true;
+                }
             }
         }
-        // dd($new_menu_items);
+
         return $menu_items;
     }
 }
